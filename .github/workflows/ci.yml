@@ -19,5 +19,20 @@ jobs:
         run: pip install -r requirements.txt pytest
       - name: Lancer les tests
         run: pytest -v
-      - name: S'assurer si l'image s'est crée sur Docker
-        run: docker build -t mon_image .
+  share:
+    needs: tests
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Recuperer le code
+        uses: actions/checkout@v4
+      - name: Se connecter au registre
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Construire l'image
+        run: docker build -t ghcr.io/${{ github.repository_owner }}/mon_app:latest .
+      - name: Publier l'image
+        run: docker push ghcr.io/${{ github.repository_owner }}/mon_app:latest
+  
