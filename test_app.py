@@ -4,4 +4,4 @@ def test_accueil():
     client = app.test_client()
     reponse = client.get("/")
     assert reponse.status_code == 200
-    assert b"Bonjour depuis Dcker" == reponse.data
+    assert b"Bonjour depuis Docker" == reponse.data
